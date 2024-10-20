@@ -1,38 +1,3 @@
-# from flask import Flask, render_template, send_from_directory, jsonify
-# from PIL import Image
-
-# app = Flask(__name__)
-
-# # Define the temperature range for mapping
-# MIN_TEMP = 28.2  # Minimum temperature in °C
-# MAX_TEMP = 59.1  # Maximum temperature in °C
-
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
-
-# @app.route('/images/thermography-medicine-horse.webp')
-# def serve_image():
-#     return send_from_directory('images', "thermography-medicine-horse.webp")
-
-# @app.route('/temperature-data/<int:x>/<int:y>')
-# def calculate_temperature(x, y):
-#     # Load the thermal image
-#     img = Image.open('images/thermography-medicine-horse.webp').convert('L')  # Convert to grayscale
-#     img = img.resize((400, 400))  # Resize to match displayed size
-
-#     # Get the pixel value at (x, y)
-#     pixel = img.getpixel((x, y))
-
-#     # Assuming pixel value corresponds directly to temperature (0-255)
-#     # Assuming pixel values range from 0-255, map to temperature range
-#     temp = MIN_TEMP + (pixel / 255) * (MAX_TEMP - MIN_TEMP)
-
-#     return jsonify({'temperature': temp})
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from PIL import Image
 import os
