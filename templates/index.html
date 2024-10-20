@@ -1,0 +1,134 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thermal Image Temperature Viewer</title>
+    <style>
+        #image {
+            position: relative;
+        }
+        .tooltip {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ccc;
+            padding: 5px;
+            display: none;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Thermal Image Temperature Viewer</h1>
+    <img id="image" src="../images/thermography-medicine-horse.webp" alt="Thermal Image" width="400">
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        const image = document.getElementById('image');
+        const tooltip = document.getElementById('tooltip');
+
+        image.addEventListener('mousemove', (event) => {
+            const rect = image.getBoundingClientRect();
+            const x = Math.round(event.clientX - rect.left);
+            const y = Math.round(event.clientY - rect.top);
+
+            fetch(`/temperature-data/${x}/${y}`)
+                .then(response => response.json())
+                .then(data => {
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = `${event.clientX}px`;
+                    tooltip.style.top = `${event.clientY}px`;
+                    tooltip.innerText = `Temp: ${data.temperature.toFixed(1)}°C`;
+                })
+                .catch(() => {
+                    tooltip.style.display = 'none';
+                });
+        });
+
+        image.addEventListener('mouseout', () => {
+            tooltip.style.display = 'none';
+        });
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thermal Image Temperature Viewer</title>
+    <style>
+        #image {
+            position: relative;
+            display: none; /* Hide initially */
+        }
+        .tooltip {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ccc;
+            padding: 5px;
+            display: none;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Thermal Image Temperature Viewer</h1>
+
+    <h3>Upload an Image</h3>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*">
+        <button type="submit">Upload</button>
+    </form>
+
+    <img id="image" src="" alt="Thermal Image" width="400" height="400">
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        const image = document.getElementById('image');
+        const tooltip = document.getElementById('tooltip');
+
+        // Handle image upload
+        document.getElementById('upload-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            if (result.success) {
+                
+                image.src = '../temp/images/uploaded_image.jpg'; // Load the uploaded image
+                image.style.display = 'block';
+            } else {
+                alert(result.error);
+            }
+        };
+
+        image.addEventListener('mousemove', (event) => {
+            const rect = image.getBoundingClientRect();
+            const x = Math.round(event.clientX - rect.left);
+            const y = Math.round(event.clientY - rect.top);
+
+            fetch(`/temperature-data/${x}/${y}`)
+                .then(response => response.json())
+                .then(data => {
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = `${event.clientX}px`;
+                    tooltip.style.top = `${event.clientY}px`;
+                    tooltip.innerText = `Temp: ${data.temperature.toFixed(1)}°C`;
+                })
+                .catch(() => {
+                    tooltip.style.display = 'none';
+                });
+        });
+
+        image.addEventListener('mouseout', () => {
+            tooltip.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
+
