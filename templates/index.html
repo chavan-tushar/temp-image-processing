@@ -1,80 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Thermal Image Temperature Viewer</title>
     <style>
-        #image {
-            position: relative;
-            display: none; /* Hide initially */
-        }
-        .tooltip {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid #ccc;
-            padding: 5px;
-            display: none;
-            pointer-events: none;
-        }
+      #image {
+        position: relative;
+        display: none; /* Hide initially */
+      }
+      .tooltip {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid #ccc;
+        padding: 5px;
+        display: none;
+        pointer-events: none;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Thermal Image Temperature Viewer</h1>
 
     <h3>Upload an Image</h3>
     <form id="upload-form" enctype="multipart/form-data">
-        <input type="file" name="image" accept="image/*">
-        <button type="submit">Upload</button>
+      <input type="file" name="image" accept="image/*" />
+      <button type="submit">Upload</button>
     </form>
 
-    <img id="image" src="" alt="Thermal Image" width="400" height="400">
+    <img id="image" src="" alt="Thermal Image" width="400" height="400" />
     <div class="tooltip" id="tooltip"></div>
+    <button id="save-excel" style="margin-top: 20px; display: none">
+      Save Data to Excel
+    </button>
 
     <script>
-        const image = document.getElementById('image');
-        const tooltip = document.getElementById('tooltip');
+      const image = document.getElementById("image");
+      const tooltip = document.getElementById("tooltip");
+      const saveExcelButton = document.getElementById("save-excel");
 
-        // Handle image upload
-        document.getElementById('upload-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const response = await fetch('/upload', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            if (result.success) {
-                
-                image.src = '../temp/images/uploaded_image.jpg'; // Load the uploaded image
-                image.style.display = 'block';
-            } else {
-                alert(result.error);
-            }
-        };
-
-        image.addEventListener('mousemove', (event) => {
-            const rect = image.getBoundingClientRect();
-            const x = Math.round(event.clientX - rect.left);
-            const y = Math.round(event.clientY - rect.top);
-
-            fetch(`/temperature-data/${x}/${y}`)
-                .then(response => response.json())
-                .then(data => {
-                    tooltip.style.display = 'block';
-                    tooltip.style.left = `${event.clientX}px`;
-                    tooltip.style.top = `${event.clientY}px`;
-                    tooltip.innerText = `Temp: ${data.temperature.toFixed(1)}°C`;
-                })
-                .catch(() => {
-                    tooltip.style.display = 'none';
-                });
+      // Handle image upload
+      document.getElementById("upload-form").onsubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const response = await fetch("/upload", {
+          method: "POST",
+          body: formData,
         });
+        const result = await response.json();
+        if (result.success) {
+          image.src = "../temp/images/uploaded_image.jpg"; // Load the uploaded image
+          image.style.display = "block";
+          saveExcelButton.style.display = "block"; // Show the Save to Excel button
+        } else {
+          alert(result.error);
+        }
+      };
 
-        image.addEventListener('mouseout', () => {
-            tooltip.style.display = 'none';
-        });
+      image.addEventListener("mousemove", (event) => {
+        const rect = image.getBoundingClientRect();
+        const x = Math.round(event.clientX - rect.left);
+        const y = Math.round(event.clientY - rect.top);
+
+        fetch(`/temperature-data/${x}/${y}`)
+          .then((response) => response.json())
+          .then((data) => {
+            tooltip.style.display = "block";
+            tooltip.style.left = `${event.clientX}px`;
+            tooltip.style.top = `${event.clientY}px`;
+            tooltip.innerText = `Temp: ${data.temperature.toFixed(1)}°C`;
+          })
+          .catch(() => {
+            tooltip.style.display = "none";
+          });
+      });
+
+      image.addEventListener("mouseout", () => {
+        tooltip.style.display = "none";
+      });
+
+      // Handle Save to Excel button click
+      saveExcelButton.onclick = async () => {
+        const response = await fetch("/save-to-excel", { method: "POST" });
+        const result = await response.json();
+        if (result.success) {
+          alert("Data successfully saved to Excel!");
+        } else {
+          alert(`Error: ${result.error}`);
+        }
+      };
     </script>
-</body>
+  </body>
 </html>
-
