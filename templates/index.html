@@ -16,6 +16,8 @@
         padding: 5px;
         display: none;
         pointer-events: none;
+        font-family: monospace; /* Ensures equal spacing */
+        white-space: pre; /* Preserves spacing and line breaks */
       }
     </style>
   </head>
@@ -66,9 +68,15 @@
           .then((response) => response.json())
           .then((data) => {
             tooltip.style.display = "block";
-            tooltip.style.left = `${event.clientX}px`;
-            tooltip.style.top = `${event.clientY}px`;
-            tooltip.innerText = `Temp: ${data.temperature.toFixed(1)}°C`;
+            tooltip.style.left = `${event.clientX + 10}px`; // Add offset for better visibility
+            tooltip.style.top = `${event.clientY + 10}px`;
+
+            // Format tooltip content with padding for alignment
+            const xCord = `X-Cord: ${x}`.padEnd(15);
+            const yCord = `Y-Cord: ${y}`.padEnd(15);
+            const temp = `Temp: ${data.temperature.toFixed(1)}°C`;
+
+            tooltip.innerText = `${xCord}\n${yCord}\n${temp}`;
           })
           .catch(() => {
             tooltip.style.display = "none";
